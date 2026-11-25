@@ -1,5 +1,5 @@
 {
-  "name": "Auth-proxy",
+  "name": "auth-proxy",
   "version": "0.1.0",
   "description": "Gateway de autenticação (AD via LDAPS + JWT, depois Microsoft Entra ID) para apps internos",
   "type": "module",
@@ -12,9 +12,16 @@
   "scripts": {
     "dev": "node --watch --env-file-if-exists=.env src/server.js",
     "start": "node src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "express": "^5.x.x"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0"
   }
 }
