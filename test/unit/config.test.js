@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadConfig, ConfigError } from '../../src/config/index.js';
 
-const SEGREDO = 'segredo-de-teste-com-mais-de-32-caracteres'
+const SEGREDO = 'oIlSEAzkagv78rB3vTy1K5INkzFVSc3AJFxsyDfoU5A'
 const base = { PUBLIC_URL: 'http://localhost:3000', CSRF_SECRET: SEGREDO };
 
 test('usa padrões seguros quando a variável não existe', () => {
