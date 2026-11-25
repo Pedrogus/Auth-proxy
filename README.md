@@ -38,8 +38,17 @@ Teste: `GET http://127.0.0.1:3000/health` deve responder `{"status":"ok"}`.
 | `HOST` | Não | `127.0.0.1` | Em produção, precisa ser loopback |
 | `PORT` | Não | `3000` | Porta interna |
 | `PUBLIC_URL` | Sim | | URL acessada pelo navegador. Em produção, `https` |
+| `CSRF_SECRET` | Sim | | Segredo do token CSRF, mínimo de 32 caracteres. Gerar com `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"` |
 
 O serviço não sobe se alguma variável for inválida e lista todos os problemas.
+
+## Rotas
+
+| Rota | Descrição |
+|---|---|
+| `GET /health` | Verificação de saúde, sem login |
+| `GET /login` | Formulário de login com token CSRF |
+| `POST /login` | Valida CSRF e origem (autenticação no AD em desenvolvimento) |
 
 ## Licença
 
