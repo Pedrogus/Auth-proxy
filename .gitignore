@@ -1,0 +1,17 @@
+# Dependências
+node_modules/
+
+# Segredos e configuração local
+.env
+.env.*
+!.env.example
+
+# Chaves e certificados
+keys/
+*.pem
+*.key
+
+# Dados e logs locais
+data/
+logs/
+coverage/
