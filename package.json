@@ -1,0 +1,20 @@
+{
+  "name": "Auth-proxy",
+  "version": "0.1.0",
+  "description": "Gateway de autenticação (AD via LDAPS + JWT, depois Microsoft Entra ID) para apps internos",
+  "type": "module",
+  "main": "src/server.js",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=.env src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^5.x.x"
+  }
+}
