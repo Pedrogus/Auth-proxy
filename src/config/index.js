@@ -1,3 +1,5 @@
+import { resolve } from 'node:path';
+
 const AMBIENTES = ['development', 'test', 'production'];
 const LOOPBACK = ['127.0.0.1', '::1', 'localhost'];
 
@@ -26,12 +28,13 @@ export function loadConfig(env = process.env) {
   const port = lerPorta(env.PORT, 3000, problemas);
   const publicUrl = lerUrlPublica(env.PUBLIC_URL, isProduction, problemas);
   const csrfSecret = lerSegredo(env.CSRF_SECRET, 'CSRF_SECRET', problemas);
+  const usersFile = resolve(env.USERS_FILE || 'data/usuarios.json');
 
   if (problemas.length > 0) {
     throw new ConfigError(problemas);
   }
 
-  return Object.freeze({ nodeEnv, isProduction, host, port, publicUrl, cookieStore: publicUrl.startsWith('https:'), csrfSecret });
+  return Object.freeze({ nodeEnv, isProduction, host, port, publicUrl, cookieStore: publicUrl.startsWith('https:'), csrfSecret, usersFile, });
 }
 
 function lerPorta(valor, padrao, problemas) {

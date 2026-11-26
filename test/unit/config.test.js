@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { join } from 'node:path';
 import { loadConfig, ConfigError } from '../../src/config/index.js';
 
 const SEGREDO = 'oIlSEAzkagv78rB3vTy1K5INkzFVSc3AJFxsyDfoU5A'
@@ -49,4 +50,9 @@ test('recusa segredo curto sem mostrar o valor na mensagem', () => {
     () => loadConfig({ ...base, CSRF_SECRET: 'curto-demais' }),
     (erro) => erro instanceof ConfigError && !erro.message.includes('curto-demais'),
   );
+});
+
+test('usa data/usuarios.json como arquivo de usuários padrão', () => {
+  const config = loadConfig(base);
+  assert.ok(config.usersFile.endsWith(join('data', 'usuarios.json')));
 });

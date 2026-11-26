@@ -6,13 +6,28 @@ import { loadConfig } from '../../src/config/index.js';
 
 const PUBLIC_URL = 'http://localhost:3000';
 
-const app = createApp(
-  loadConfig({
-    NODE_ENV: 'test',
-    PUBLIC_URL,
-    CSRF_SECRET: 'segredo-de-teste-com-mais-de-32-caracteres',
-  }),
-);
+
+//provedor
+const provedorFalso = {
+  chamadas: 0,
+  async autenticar(login, senha) {
+    this.chamadas += 1;
+    if (senha !== 'senha-correta') return { ok: false, motivo: 'credenciais_invalidas' };
+    if (login === 'ana.teste') {
+      return { ok: true, usuario: { nome: 'Ana Teste', email: 'ana.teste', grupo: 'User' } };
+    }
+    if (login === 'caio.inativo') return { ok: false, motivo: 'conta_desativada' };
+    return { ok: false, motivo: 'credenciais_invalidas' };
+  },
+};
+
+const config = loadConfig({
+  NODE_ENV: 'test',
+  PUBLIC_URL,
+  CSRF_SECRET: 'segredo-de-teste-com-mais-de-32-caracteres',
+});
+
+const app = createApp(config, { provedor: provedorFalso });
 
 // Abre o /login e devolve o token que veio escondido no formulário
 async function abrirLogin(agent) {
@@ -43,13 +58,62 @@ test('GET /login entrega formulário com token e cookie protegido', async () => 
   assert.match(cookie, /SameSite=Strict/);
 });
 
-test('POST com cookie, token e origem corretos passa pelo CSRF', async () => {
+test('login correto devolve nome e grupo e apaga o cookie CSRF', async () => {
   const agent = request.agent(app);
   const { token } = await abrirLogin(agent);
 
-  const res = await enviar(agent, { _csrf: token, usuario: 'teste', senha: 'x' });
+  const res = await enviar(agent, { _csrf: token, usuario: 'ana.teste', senha: 'senha-correta' });
 
-  assert.equal(res.status, 501); // a autenticação no AD entra na E2-03
+  assert.equal(res.status, 200);
+  assert.deepEqual(res.body, { nome: 'Ana Teste', email: 'ana.teste', grupo: 'User' });
+  assert.match(res.headers['set-cookie'].join(';'), /csrf=;.*Expires=Thu, 01 Jan 1970/);
+});
+
+test('senha errada responde 401 com formulário novo', async () => {
+  const agent = request.agent(app);
+  const { token } = await abrirLogin(agent);
+
+  const res = await enviar(agent, { _csrf: token, usuario: 'ana.teste', senha: 'errada' });
+
+  assert.equal(res.status, 401);
+  assert.match(res.text, /Usuário ou senha inválidos/);
+  assert.match(res.text, /name="_csrf" value="[^"]+"/);
+});
+
+test('conta desativada responde 403 com mensagem própria', async () => {
+  const agent = request.agent(app);
+  const { token } = await abrirLogin(agent);
+
+  const res = await enviar(agent, { _csrf: token, usuario: 'caio.inativo', senha: 'senha-correta' });
+
+  assert.equal(res.status, 403);
+  assert.match(res.text, /Conta desativada/);
+});
+
+test('sem CSRF válido, o provedor nem é consultado', async () => {
+  const agent = request.agent(app);
+  await abrirLogin(agent);
+  provedorFalso.chamadas = 0;
+
+  await enviar(agent, { usuario: 'ana.teste', senha: 'senha-correta' });
+
+  assert.equal(provedorFalso.chamadas, 0);
+});
+
+test('falha no provedor vira 500 genérico, sem detalhes', async () => {
+  const provedorQuebrado = {
+    async autenticar() {
+      throw new Error('detalhe interno que não pode vazar');
+    },
+  };
+  const appQuebrado = createApp(config, { provedor: provedorQuebrado });
+  const agent = request.agent(appQuebrado);
+  const { token } = await abrirLogin(agent);
+
+  const res = await enviar(agent, { _csrf: token, usuario: 'ana.teste', senha: 'senha-correta' });
+
+  assert.equal(res.status, 500);
+  assert.deepEqual(res.body, { erro: 'Erro interno' });
 });
 
 test('POST sem token é recusado', async () => {
