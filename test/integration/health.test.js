@@ -7,6 +7,7 @@ import { loadConfig } from '../../src/config/index.js';
 const config = loadConfig({
   NODE_ENV: 'test',
   PUBLIC_URL: 'http://localhost:3000',
+  CSRF_SECRET: 'segredo-de-teste-com-mais-de-32-caracteres',
 });
 const app = createApp(config);
 

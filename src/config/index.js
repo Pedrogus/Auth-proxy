@@ -25,12 +25,13 @@ export function loadConfig(env = process.env) {
 
   const port = lerPorta(env.PORT, 3000, problemas);
   const publicUrl = lerUrlPublica(env.PUBLIC_URL, isProduction, problemas);
+  const csrfSecret = lerSegredo(env.CSRF_SECRET, 'CSRF_SECRET', problemas);
 
   if (problemas.length > 0) {
     throw new ConfigError(problemas);
   }
 
-  return Object.freeze({ nodeEnv, isProduction, host, port, publicUrl });
+  return Object.freeze({ nodeEnv, isProduction, host, port, publicUrl, cookieStore: publicUrl.startsWith('https:'), csrfSecret });
 }
 
 function lerPorta(valor, padrao, problemas) {
@@ -62,4 +63,16 @@ function lerUrlPublica(valor, isProduction, problemas) {
     problemas.push('PUBLIC_URL deve usar https em produção');
   }
   return url.origin;
+}
+
+function lerSegredo(valor, nome, problemas) {
+    if(!valor) {
+        problemas.push(`${nome} é obrigatorio`);
+        return undefined;
+    }
+    if(valor.length < 32) {
+        problemas.push(`${nome} deve ter pelo menos 32 caracteres`);
+        return undefined;
+    } 
+    return valor;
 }

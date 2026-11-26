@@ -2,7 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadConfig, ConfigError } from '../../src/config/index.js';
 
-const base = { PUBLIC_URL: 'http://localhost:3000' };
+const SEGREDO = 'oIlSEAzkagv78rB3vTy1K5INkzFVSc3AJFxsyDfoU5A'
+const base = { PUBLIC_URL: 'http://localhost:3000', CSRF_SECRET: SEGREDO };
 
 test('usa padrões seguros quando a variável não existe', () => {
   const config = loadConfig(base);
@@ -24,6 +25,7 @@ test('em produção exige loopback e https, e lista os dois problemas', () => {
     NODE_ENV: 'production',
     HOST: '0.0.0.0',
     PUBLIC_URL: 'http://auth.contoso.local',
+    CSRF_SECRET: SEGREDO,
   };
   assert.throws(
     () => loadConfig(env),
@@ -36,4 +38,15 @@ test('configuração não pode ser alterada depois de carregada', () => {
   assert.throws(() => {
     config.port = 1;
   }, TypeError);
+});
+
+test('não sobe sem CSRF_SECRET', () => {
+  assert.throws(() => loadConfig({ PUBLIC_URL: 'http://localhost:3000' }), /CSRF_SECRET/);
+});
+
+test('recusa segredo curto sem mostrar o valor na mensagem', () => {
+  assert.throws(
+    () => loadConfig({ ...base, CSRF_SECRET: 'curto-demais' }),
+    (erro) => erro instanceof ConfigError && !erro.message.includes('curto-demais'),
+  );
 });
