@@ -1,0 +1,23 @@
+[
+  {
+    "nome": "Usuário Exemplo",
+    "email": "usuario.exemplo",
+    "senhaHash": "GERAR_COM_npm_run_hash",
+    "grupo": "User",
+    "ativo": true
+  },
+  {
+    "nome": "Admin Exemplo",
+    "email": "admin.exemplo",
+    "senhaHash": "GERAR_COM_npm_run_hash",
+    "grupo": "Admin",
+    "ativo": true
+  },
+  {
+    "nome": "Desativado Exemplo",
+    "email": "desativado.exemplo",
+    "senhaHash": "GERAR_COM_npm_run_hash",
+    "grupo": "User",
+    "ativo": false
+  }
+]

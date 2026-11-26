@@ -12,3 +12,7 @@ Formato baseado em Keep a Changelog. Versões seguem SemVer.
 - Testes unitários e de integração com `node:test` e `supertest`.
 - Página de login com proteção CSRF (cookie assinado com HMAC) e checagem de Origin (E2-02).
 - Respostas 4xx de leitura do corpo sem registro em log, para não gravar senhas.
+
+pedro - pedro.teste
+adm - adm123456
+desligado - 12345678

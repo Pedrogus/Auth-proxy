@@ -26,4 +26,8 @@ js.configs.recommended,
         'no-new-func': 'error',
         },
     },
+    {
+    files: ['scripts/**/*.js'],
+    rules: { 'no-console': 'off' },
+  },
 ];

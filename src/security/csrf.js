@@ -29,6 +29,11 @@ export function criarCsrf({ secret, secure }) {
     return assinar(valor);
   }
 
+  function limpar(res) {
+    // precisa repetir as mesmas opções da criação, senão o navegador não apaga
+    res.clearCookie(nomeCookie, { httpOnly: true, secure, sameSite: 'strict', path: '/' });
+  }
+
   function validar(req) {
     const valor = req.cookies?.[nomeCookie];
     const enviado = req.body?._csrf;
@@ -43,7 +48,7 @@ export function criarCsrf({ secret, secure }) {
     return esperado.length === recebido.length && timingSafeEqual(esperado, recebido);
   }
 
-  return { nomeCookie, emitir, validar };
+  return { nomeCookie, emitir, validar, limpar  };
 }
 
 /**
@@ -53,3 +58,4 @@ export function criarCsrf({ secret, secure }) {
 export function origemValida(req, publicUrl) {
   return req.get('origin') === publicUrl;
 }
+

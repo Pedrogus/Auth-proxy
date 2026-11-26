@@ -1,3 +1,4 @@
+import { criarProvedorLocal } from './auth/local/provedor.js';
 import { loadConfig, ConfigError } from './config/index.js';
 import { createApp } from './app.js';
 
@@ -12,7 +13,15 @@ try {
   throw erro;
 }
 
-const app = createApp(config);
+let provedor;
+try {
+  provedor = await criarProvedorLocal(config.usersFile);
+} catch (erro) {
+  console.error(erro.message);
+  process.exit(1);
+}
+
+const app = createApp(config, { provedor });
 
 const server = app.listen(config.port, config.host, (erro) => {
   if (erro) return; // tratado no server.on('error')

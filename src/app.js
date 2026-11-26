@@ -4,7 +4,7 @@ import { criarCsrf } from './security/csrf.js';
 import { healthRouter } from './routes/health.js';
 import { loginRouter } from './routes/login.js';
 
-export function createApp(config) {
+export function createApp(config, { provedor } = {}) {
   const app = express();
 
   app.set('env', config.nodeEnv);
@@ -16,7 +16,7 @@ export function createApp(config) {
   const csrf = criarCsrf({ secret: config.csrfSecret, secure: config.cookieSecure });
 
   app.use(healthRouter());
-  app.use(loginRouter({ csrf, publicUrl: config.publicUrl }));
+  app.use(loginRouter({ csrf, publicUrl: config.publicUrl, provedor }));
 
   app.use((_req, res) => {
     res.status(404).json({ erro: 'Não encontrado' });
